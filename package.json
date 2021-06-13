@@ -11,5 +11,8 @@
   "dependencies": {
     "googleapis": "^39.2.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "eslint": "^7.28.0",
+    "eslint-config-google": "^0.14.0"
+  }
 }
