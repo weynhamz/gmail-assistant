@@ -2,20 +2,16 @@ const Auth = require('@google-cloud/express-oauth2-handlers');
 const {Datastore} = require('@google-cloud/datastore');
 const {google} = require('googleapis');
 const gmail = google.gmail('v1');
-const googleSheets = google.sheets('v4');
-const vision = require('@google-cloud/vision');
+
 
 const datastoreClient = new Datastore();
-const visionClient = new vision.ImageAnnotatorClient();
 
-const SHEET = process.env.GOOGLE_SHEET_ID;
-const SHEET_RANGE = 'Sheet1!A1:F1';
+
 
 const requiredScopes = [
   'profile',
   'email',
-  'https://www.googleapis.com/auth/gmail.modify',
-  'https://www.googleapis.com/auth/spreadsheets'
+  'https://www.googleapis.com/auth/gmail.modify'
 ];
 
 const auth = Auth('datastore', requiredScopes, 'email', true);
@@ -60,6 +56,7 @@ const getMostRecentMessageWithTag = async (email, historyId) => {
 // from the message.
 const extractInfoFromMessage = (message) => {
   const messageId = message.data.id;
+
   let from;
   let filename;
   let attachmentId;
@@ -96,37 +93,83 @@ const extractAttachmentFromMessage = async (email, messageId, attachmentId) => {
   });
 };
 
-// Tag the attachment using Cloud Vision API
-const analyzeAttachment = async (data, filename) => {
-  var topLabels = ['', '', ''];
-  if (filename.endsWith('.png') || filename.endsWith('.jpg')) {
-    const [analysis] = await visionClient.labelDetection({
-      image: {
-        content: Buffer.from(data, 'base64')
-      }
-    });
-    const labels = analysis.labelAnnotations;
-    topLabels = labels.map(x => x.description).slice(0, 3);
-  }
+/**
+ * Lists the labels in the user's account.
+ *
+ * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
+ */
+async function listLabels() {
+  let ret = {};
 
-  return topLabels;
-};
-
-// Write sender, attachment filename, and download link to a Google Sheet.
-const updateReferenceSheet = async (from, filename, topLabels) => {
-  await googleSheets.spreadsheets.values.append({
-    spreadsheetId: SHEET,
-    range: SHEET_RANGE,
-    valueInputOption: 'USER_ENTERED',
-    requestBody: {
-      range: SHEET_RANGE,
-      majorDimension: 'ROWS',
-      values: [
-        [from, filename].concat(topLabels)
-      ]
-    }
+  let labelsRes = await gmail.users.labels.list({
+    userId: 'me',
   });
-};
+  
+  let labels = labelsRes.data.labels;
+
+  if (labels.length) {
+    labels.forEach((label) => {
+      ret[label.id] = label;
+    });
+  }
+  
+  return ret;
+}
+
+async function fixThreadLables(threadId) {
+    let threadLabelIds = [];
+
+    let messagesRes = await gmail.users.threads.get({
+        userId: 'me',
+        id: threadId,
+    });
+
+    let messages = messagesRes.data.messages;
+
+    // Skip if only 1 message in thread
+    if (messages.length <= 1) {
+        return;
+    }
+
+    const Labels = await listLabels();
+
+    // Loop through messages in the thread
+    // to caculate thread labels
+    messages.forEach((message) => {
+        // only care about user labels
+        let labelIds = message.labelIds.filter((labelId) => {
+            if(Labels[labelId].type == 'system') {
+                return false;
+            }
+            return true;
+        });
+
+        console.log('Message Label Ids:');
+        console.log(labelIds);
+
+        // Add to thread labels and make it unique
+        threadLabelIds = [ ...new Set([...threadLabelIds, ...labelIds])];
+    });
+
+    // Skip if no thread labels found
+    if (threadLabelIds.length == 0) {
+        return;
+    }
+
+    console.log('Thread Label Ids:');
+    console.log(threadLabelIds);
+
+    // Apply labels to the entile thread
+    await gmail.users.threads.modify({
+        userId: 'me',
+        id: threadId,
+        requestBody: {
+            addLabelIds: threadLabelIds,
+        },
+    });
+
+    console.log('=============');
+}
 
 exports.watchGmailMessages = async (event) => {
   // Decode the incoming Gmail push notification.
@@ -147,11 +190,13 @@ exports.watchGmailMessages = async (event) => {
   // Process the incoming message.
   const message = await getMostRecentMessageWithTag(email, historyId);
   if (message) {
-    const messageInfo = extractInfoFromMessage(message);
-    if (messageInfo.attachmentId && messageInfo.attachmentFilename) {
-      const attachment = await extractAttachmentFromMessage(email, messageInfo.messageId, messageInfo.attachmentId);
-      const topLabels = await analyzeAttachment(attachment.data.data, messageInfo.attachmentFilename);
-      await updateReferenceSheet(messageInfo.from, messageInfo.attachmentFilename, topLabels);
+    console.log(message);
+    console.log("thread id" + message.data.threadId);
+    
+    if (message.data.threadId) {
+      await fixThreadLables(message.data.threadId);
     }
+    //const messageInfo = extractInfoFromMessage(message);
+    //console.log(messageInfo);
   }
 };

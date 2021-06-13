@@ -12,8 +12,7 @@ const gmail = google.gmail('v1');
 const requiredScopes = [
   'profile',
   'email',
-  'https://www.googleapis.com/auth/gmail.modify',
-  'https://www.googleapis.com/auth/spreadsheets'
+  'https://www.googleapis.com/auth/gmail.modify'
 ];
 
 const auth = Auth('datastore', requiredScopes, 'email', true);
