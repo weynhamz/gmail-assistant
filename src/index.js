@@ -1,9 +1,23 @@
 const fs = require('fs');
 
 const {google} = require('googleapis');
+const {Worker} = require('worker_threads');
 
 const {authorize} = require('./auth.js');
-const {fixThreadLabels} = require('./gmail.js');
+
+const worker = new Worker('./src/worker.js');
+
+let concurrency = 0;
+
+worker.on('message', (result) => {
+  concurrency--;
+
+  console.log(`${result}`);
+});
+
+worker.on('error', (error) => {
+  console.log(error);
+});
 
 let count = 0;
 
@@ -56,11 +70,20 @@ fs.readFile('credentials.json', async (err, credentials) => {
     for (const thread of threads) {
       console.log(thread);
 
+      while (concurrency > 5) {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      }
+
       count++;
 
-      await fixThreadLabels(auth, thread.id, Labels);
+      concurrency++;
 
-      console.log(`${count} Processed ${thread.id}`);
+      worker.postMessage({
+        count: count,
+        credentials: JSON.parse(credentials),
+        thread: thread,
+        Labels: Labels,
+      });
     }
 
     console.log('====================');
