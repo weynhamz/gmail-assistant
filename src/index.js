@@ -88,6 +88,6 @@ fs.readFile('credentials.json', async (err, credentials) => {
 
     console.log('====================');
 
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
   } while (threadsRes.data.nextPageToken !== undefined);
 });
