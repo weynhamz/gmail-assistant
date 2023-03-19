@@ -52,14 +52,14 @@ fs.readFile('credentials.json', async (err, credentials) => {
       pageToken = threadsRes.data.nextPageToken;
     }
 
-    threadsRes = await gmail.users.threads.list({
+    threadsRes = await gmail.users.messages.list({
       userId: 'me',
       q: 'in:inbox',
       maxResults: 100,
       pageToken: pageToken,
     });
 
-    threads = threadsRes.data.threads;
+    threads = threadsRes.data.messages;
 
     // Bail out if no thread found
     if (threads.length < 0) {

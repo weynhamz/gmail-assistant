@@ -9,11 +9,11 @@ parentPort.on('message', async (data) => {
 
   try {
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    await fixThreadLabels(auth, data.thread.id, data.Labels);
+    await fixThreadLabels(auth, data.thread.threadId, data.Labels);
   } catch (e) {
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    await fixThreadLabels(auth, data.thread.id, data.Labels);
+    await fixThreadLabels(auth, data.thread.threadId, data.Labels);
   }
 
-  parentPort.postMessage(`${data.count} Processed ${data.thread.id}`);
+  parentPort.postMessage(`${data.count} Processed ${data.thread.threadId}`);
 });
