@@ -25,6 +25,7 @@ provider:
 frameworkVersion: '3'
 
 plugins:
+  - serverless-plugin-scripts
   - serverless-google-cloudfunctions
 
 # needs more granular excluding in production as only the serverless provider npm
@@ -32,10 +33,21 @@ plugins:
 package:
   exclude:
     - node_modules/**
+    - scripts/**
     - .gitignore
     - .git/**
 
 custom:
+  scripts:
+    # NOTE: uncomment the following if you want the `sls-update-allow-unauthenticated.sh` script to
+    # run after every deploy. Otherwise just run the script manually.
+    hooks:
+      "after:deploy:deploy": ./scripts/sls-update-allow-unauthenticated.sh
+    commands:
+      # make the specified function public
+      mkfunc-pub: gcloud functions add-iam-policy-binding ${self:service}-${self:provider.stage}-${opt:function, ""} --member="allUsers" --role="roles/cloudfunctions.invoker" --project=${self:provider.project} --region=${self:provider.region}
+      # make the specified function private
+      mkfunc-pvt: gcloud functions remove-iam-policy-binding ${self:service}-${self:provider.stage}-${opt:function, ""} --member="allUsers" --role="roles/cloudfunctions.invoker" --project=${self:provider.project} --region=${self:provider.region}
   topicName: ${self:service}-gmail-push
   topicResource: projects/${env:GCP_PROJECT}/topics/${self:custom.topicName}
 
@@ -44,10 +56,31 @@ functions:
     handler: auth_init
     events:
       - http: true
+    accessControl:
+      gcpIamPolicy:
+        bindings:
+        - role: roles/cloudfunctions.invoker
+          members:
+          - "allUsers"
+    # unofficial flag that ties into the post-deploy script; set to false or omit the key if you
+    # don't want to make the function public; you will need to run the `sls-update-allow-unauthenticated.sh`
+    # script to update the function permissions
+    allowUnauthenticated: true
+
   auth_callback:
     handler: auth_callback
     events:
       - http: true
+    accessControl:
+      gcpIamPolicy:
+        bindings:
+        - role: roles/cloudfunctions.invoker
+          members:
+          - "allUsers"
+    # unofficial flag that ties into the post-deploy script; set to false or omit the key if you
+    # don't want to make the function public; you will need to run the `sls-update-allow-unauthenticated.sh`
+    # script to update the function permissions
+    allowUnauthenticated: true
 
   # NOTE: the following uses an "event" event (pubSub event in this case).
   # Please create the corresponding resources in the Google Cloud

@@ -2437,6 +2437,11 @@ serverless-google-cloudfunctions@^4.1.0:
     googleapis "^50.0.0"
     lodash "^4.17.21"
 
+serverless-plugin-scripts@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/serverless-plugin-scripts/-/serverless-plugin-scripts-1.0.2.tgz#21808c3cfd0a1a84e48c0660b0f6f370b5665486"
+  integrity sha512-+OL9fFz5r6BXNHfpu9MDLehS/haC0fy/T3V5uJsTfLAnNsn+PzM6BmvefUfWG372hBT7piTbywB1Vl1+4LmI5Q==
+
 set-blocking@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/set-blocking/-/set-blocking-2.0.0.tgz#045f9782d011ae9a6803ddd382b24392b3d890f7"
