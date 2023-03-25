@@ -1,0 +1,25 @@
+{
+  "name": "gmail-assistant",
+  "author": "weynhamz@gmail.com",
+  "version": "1.0.0",
+  "license": "ISC",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "lint": "./node_modules/.bin/eslint src/",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "pre-commit": [
+    "lint"
+  ],
+  "dependencies": {
+    "googleapis": "^39.2.0",
+    "serverless-google-cloudfunctions": "^4.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.28.0",
+    "eslint-config-google": "^0.14.0",
+    "jsdoc": "^3.6.7",
+    "pre-commit": "^1.2.2"
+  }
+}
