@@ -71,7 +71,13 @@ functions:
 #    - path: my_template.jinja
 resources:
   resources:
-    - type: gcp-types/pubsub-v1:projects.topics
+    - type: pubsub.v1.topic
       name: ${self:custom.topicName}
       properties:
         topic: ${self:custom.topicName}
+      accessControl:
+        gcpIamPolicy:
+          bindings:
+            - role: roles/pubsub.publisher
+              members:
+                  - "serviceAccount:gmail-api-push@system.gserviceaccount.com"
