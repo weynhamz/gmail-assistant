@@ -15,6 +15,7 @@ provider:
   #  credentials: ~/.gcloud/keyfile.json
   credentials: ~/.config/gcloud/application_default_credentials.json
   environment:
+    GCP_PROJECT: ${env:GCP_PROJECT}
     PUBSUB_TOPIC: ${self:custom.topicName}
     GOOGLE_CLIENT_ID: ${env:GOOGLE_CLIENT_ID}
     GOOGLE_CLIENT_SECRET: ${env:GOOGLE_CLIENT_SECRET}
@@ -57,6 +58,8 @@ functions:
       - event:
           eventType: providers/cloud.pubsub/eventTypes/topic.publish
           resource: ${self:custom.topicResource}
+    environment:
+      FUNCTION_TRIGGER_TYPE: CLOUD_PUBSUB_TRIGGER
 
 # you can define resources, templates etc. the same way you would in a
 # Google Cloud deployment configuration
