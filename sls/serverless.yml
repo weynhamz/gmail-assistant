@@ -1,17 +1,24 @@
 service: gmail-assistant
 
+useDotenv: true
+
 provider:
   name: google
   stage: ${opt:stage, 'dev'}
   region: us-central1
   runtime: nodejs12
-  project: oceanic-cacao-252415
+  project: ${env:GCP_PROJECT}
   # The GCF credentials can be a little tricky to set up. Luckily we've documented this for you here:
   # https://serverless.com/framework/docs/providers/google/guide/credentials/
   #
   # the path to the credentials file needs to be absolute
   #  credentials: ~/.gcloud/keyfile.json
   credentials: ~/.config/gcloud/application_default_credentials.json
+  environment:
+    GOOGLE_CLIENT_ID: ${env:GOOGLE_CLIENT_ID}
+    GOOGLE_CLIENT_SECRET: ${env:GOOGLE_CLIENT_SECRET}
+    GOOGLE_CALLBACK_URL: ${env:GOOGLE_CALLBACK_URL}
+    GOOGLE_SHEET_ID: ${env:GOOGLE_SHEET_ID}
 
 frameworkVersion: '3'
 
