@@ -40,7 +40,7 @@ functions:
     events:
       - event:
           eventType: providers/cloud.pubsub/eventTypes/topic.publish
-          resource: projects/*/topics/my-topic
+          resource: projects/oceanic-cacao-252415/topics/my-topic
 
 # you can define resources, templates etc. the same way you would in a
 # Google Cloud deployment configuration
