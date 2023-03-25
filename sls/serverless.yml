@@ -13,7 +13,7 @@ provider:
   #  credentials: ~/.gcloud/keyfile.json
   credentials: ~/.config/gcloud/application_default_credentials.json
 
-frameworkVersion: '2'
+frameworkVersion: '3'
 
 plugins:
   - serverless-google-cloudfunctions
