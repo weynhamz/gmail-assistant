@@ -20,5 +20,6 @@
     "eslint-config-google": "^0.14.0",
     "jsdoc": "^3.6.7",
     "pre-commit": "^1.2.2"
-  }
+  },
+  "packageManager": "yarn@3.5.0"
 }
