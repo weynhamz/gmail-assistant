@@ -13,7 +13,7 @@ const requiredScopes = [
   'profile',
   'email',
   'https://www.googleapis.com/auth/gmail.modify',
-  'https://www.googleapis.com/auth/spreadsheets'
+  'https://www.googleapis.com/auth/spreadsheets',
 ];
 
 const auth = Auth('datastore', requiredScopes, 'email', true);
@@ -29,8 +29,8 @@ const setUpGmailPushNotifications = (email, pubsubTopic) => {
     userId: email,
     requestBody: {
       labelIds: ['INBOX'],
-      topicName: `projects/${GCP_PROJECT}/topics/${pubsubTopic}`
-    }
+      topicName: `projects/${GCP_PROJECT}/topics/${pubsubTopic}`,
+    },
   });
 };
 

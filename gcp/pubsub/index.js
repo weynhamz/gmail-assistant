@@ -15,7 +15,7 @@ const requiredScopes = [
   'profile',
   'email',
   'https://www.googleapis.com/auth/gmail.modify',
-  'https://www.googleapis.com/auth/spreadsheets'
+  'https://www.googleapis.com/auth/spreadsheets',
 ];
 
 const auth = Auth('datastore', requiredScopes, 'email', true);
@@ -28,7 +28,7 @@ const checkForDuplicateNotifications = async (messageId) => {
   if (!message) {
     await transaction.save({
       key: messageKey,
-      data: {}
+      data: {},
     });
   }
   await transaction.commit();
@@ -41,7 +41,7 @@ const getMostRecentMessageWithTag = async (email, historyId) => {
   // Look up the most recent message.
   const listMessagesRes = await gmail.users.messages.list({
     userId: email,
-    maxResults: 1
+    maxResults: 1,
   });
   const messageId = await checkForDuplicateNotifications(listMessagesRes.data.messages[0].id);
 
@@ -49,7 +49,7 @@ const getMostRecentMessageWithTag = async (email, historyId) => {
   if (messageId) {
     const message = await gmail.users.messages.get({
       userId: email,
-      id: messageId
+      id: messageId,
     });
 
     return message;
@@ -65,14 +65,14 @@ const extractInfoFromMessage = (message) => {
   let attachmentId;
 
   const headers = message.data.payload.headers;
-  for (var i in headers) {
+  for (const i in headers) {
     if (headers[i].name === 'From') {
       from = headers[i].value;
     }
   }
 
   const payloadParts = message.data.payload.parts;
-  for (var j in payloadParts) {
+  for (const j in payloadParts) {
     if (payloadParts[j].body.attachmentId) {
       filename = payloadParts[j].filename;
       attachmentId = payloadParts[j].body.attachmentId;
@@ -83,7 +83,7 @@ const extractInfoFromMessage = (message) => {
     messageId: messageId,
     from: from,
     attachmentFilename: filename,
-    attachmentId: attachmentId
+    attachmentId: attachmentId,
   };
 };
 
@@ -92,21 +92,21 @@ const extractAttachmentFromMessage = async (email, messageId, attachmentId) => {
   return gmail.users.messages.attachments.get({
     id: attachmentId,
     messageId: messageId,
-    userId: email
+    userId: email,
   });
 };
 
 // Tag the attachment using Cloud Vision API
 const analyzeAttachment = async (data, filename) => {
-  var topLabels = ['', '', ''];
+  let topLabels = ['', '', ''];
   if (filename.endsWith('.png') || filename.endsWith('.jpg')) {
     const [analysis] = await visionClient.labelDetection({
       image: {
-        content: Buffer.from(data, 'base64')
-      }
+        content: Buffer.from(data, 'base64'),
+      },
     });
     const labels = analysis.labelAnnotations;
-    topLabels = labels.map(x => x.description).slice(0, 3);
+    topLabels = labels.map((x) => x.description).slice(0, 3);
   }
 
   return topLabels;
@@ -122,9 +122,9 @@ const updateReferenceSheet = async (from, filename, topLabels) => {
       range: SHEET_RANGE,
       majorDimension: 'ROWS',
       values: [
-        [from, filename].concat(topLabels)
-      ]
-    }
+        [from, filename].concat(topLabels),
+      ],
+    },
   });
 };
 
