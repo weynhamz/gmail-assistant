@@ -2,7 +2,7 @@ service: gmail-assistant
 
 provider:
   name: google
-  stage: dev
+  stage: ${opt:stage, 'dev'}
   region: us-central1
   runtime: nodejs10
   project: oceanic-cacao-252415
