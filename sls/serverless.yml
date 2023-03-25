@@ -15,6 +15,7 @@ provider:
   #  credentials: ~/.gcloud/keyfile.json
   credentials: ~/.config/gcloud/application_default_credentials.json
   environment:
+    PUBSUB_TOPIC: ${self:custom.topicName}
     GOOGLE_CLIENT_ID: ${env:GOOGLE_CLIENT_ID}
     GOOGLE_CLIENT_SECRET: ${env:GOOGLE_CLIENT_SECRET}
     GOOGLE_CALLBACK_URL: ${env:GOOGLE_CALLBACK_URL}
@@ -33,21 +34,29 @@ package:
     - .gitignore
     - .git/**
 
+custom:
+  topicName: ${self:service}-gmail-push
+  topicResource: projects/${env:GCP_PROJECT}/topics/${self:custom.topicName}
+
 functions:
-  first:
-    handler: http
+  auth_init:
+    handler: auth_init
     events:
-      - http: path
+      - http: true
+  auth_callback:
+    handler: auth_callback
+    events:
+      - http: true
 
   # NOTE: the following uses an "event" event (pubSub event in this case).
   # Please create the corresponding resources in the Google Cloud
   # before deploying this service through Serverless
-  second:
-    handler: event
+  watchGmailMessages:
+    handler: watchGmailMessages
     events:
       - event:
           eventType: providers/cloud.pubsub/eventTypes/topic.publish
-          resource: projects/oceanic-cacao-252415/topics/my-topic
+          resource: ${self:custom.topicResource}
 
 # you can define resources, templates etc. the same way you would in a
 # Google Cloud deployment configuration
@@ -60,6 +69,6 @@ functions:
 resources:
   resources:
     - type: gcp-types/pubsub-v1:projects.topics
-      name: my-topic
+      name: ${self:custom.topicName}
       properties:
-        topic: my-topic
+        topic: ${self:custom.topicName}
