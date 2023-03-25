@@ -4,7 +4,7 @@ provider:
   name: google
   stage: ${opt:stage, 'dev'}
   region: us-central1
-  runtime: nodejs10
+  runtime: nodejs12
   project: oceanic-cacao-252415
   # The GCF credentials can be a little tricky to set up. Luckily we've documented this for you here:
   # https://serverless.com/framework/docs/providers/google/guide/credentials/
