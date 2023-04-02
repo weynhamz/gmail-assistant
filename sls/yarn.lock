@@ -3610,10 +3610,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"serverless-plugin-scripts@npm:^1.0.2":
+"serverless-plugin-scripts@npm:1.0.2":
   version: 1.0.2
   resolution: "serverless-plugin-scripts@npm:1.0.2"
   checksum: 025e6576d746e4981c14c91ffbd9342df486675582ac48e2d1e13322f9f40684c098e3394f4c37bb62b99ea110d74684775c482765088ef430bb20eae1feacba
+  languageName: node
+  linkType: hard
+
+"serverless-plugin-scripts@patch:serverless-plugin-scripts@npm%3A1.0.2#./.yarn/patches/serverless-plugin-scripts-npm-1.0.2-c4df6bac6a.patch::locator=gmail-assistant%40workspace%3A.":
+  version: 1.0.2
+  resolution: "serverless-plugin-scripts@patch:serverless-plugin-scripts@npm%3A1.0.2#./.yarn/patches/serverless-plugin-scripts-npm-1.0.2-c4df6bac6a.patch::version=1.0.2&hash=257bf5&locator=gmail-assistant%40workspace%3A."
+  checksum: 4edd7fc5e7a801d3377bec7bdf9f983632c1d5807c21b867e690bb0919378e1a6c86c8b560efe6d03c2077d5b2ad1f96838272428f9fa77798a6e762160a6031
   languageName: node
   linkType: hard
 

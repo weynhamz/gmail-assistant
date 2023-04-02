@@ -1,0 +1,13 @@
+diff --git a/lib/index.js b/lib/index.js
+index a51b8cca38ec35c2ef1e6c655b2ac0a16572770f..402a6759ade15e569baab5d4fe3d5086091df973 100644
+--- a/lib/index.js
++++ b/lib/index.js
+@@ -110,7 +110,7 @@ var Scripts = function () {
+   }, {
+     key: 'execute',
+     value: function execute(command) {
+-      (0, _child_process.execSync)(command, { stdio: 'inherit' });
++      (0, _child_process.execSync)(command, { stdio: 'inherit', detached: true, shell: true });
+     }
+   }]);
+ 
