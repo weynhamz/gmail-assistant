@@ -45,9 +45,9 @@ custom:
       "after:deploy:deploy": ./scripts/sls-update-allow-unauthenticated.sh
     commands:
       # make the specified function public
-      mkfunc-pub: gcloud functions add-iam-policy-binding ${self:service}-${self:provider.stage}-${opt:function, ""} --member="allUsers" --role="roles/cloudfunctions.invoker" --project=${self:provider.project} --region=${self:provider.region}
+      mkfunc-pub: gcloud functions add-iam-policy-binding ${self:service}-${self:provider.stage}-${param:function, ""} --member="allUsers" --role="roles/cloudfunctions.invoker" --project=${self:provider.project} --region=${self:provider.region}
       # make the specified function private
-      mkfunc-pvt: gcloud functions remove-iam-policy-binding ${self:service}-${self:provider.stage}-${opt:function, ""} --member="allUsers" --role="roles/cloudfunctions.invoker" --project=${self:provider.project} --region=${self:provider.region}
+      mkfunc-pvt: gcloud functions remove-iam-policy-binding ${self:service}-${self:provider.stage}-${param:function, ""} --member="allUsers" --role="roles/cloudfunctions.invoker" --project=${self:provider.project} --region=${self:provider.region}
   topicName: ${self:service}-gmail-push
   topicResource: projects/${env:GCP_PROJECT}/topics/${self:custom.topicName}
 

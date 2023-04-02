@@ -25,7 +25,7 @@ echo "updating public functions"
 echo "-------------------------------------------------------------------------"
 for fn in ${pub[@]}; do
     echo "Making function \""$fn"\" public..."
-    sls mkfunc-pub --function="$fn"
+    sls mkfunc-pub --param="function=$fn"
 done
 echo "done"
 
@@ -35,6 +35,6 @@ echo "-------------------------------------------------------------------------"
 # Run the mkfunc-pvt command for each private function
 for fn in ${prv[@]}; do
     echo "Making function \""$fn"\" private..."
-    sls mkfunc-pvt --function="$fn"
+    sls mkfunc-pvt --param="function=$fn"
 done
 echo "done"
