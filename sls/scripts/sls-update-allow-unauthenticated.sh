@@ -29,12 +29,12 @@ for fn in ${pub[@]}; do
 done
 echo "done"
 
-echo "-------------------------------------------------------------------------"
-echo "updating private functions"
-echo "-------------------------------------------------------------------------"
-# Run the mkfunc-pvt command for each private function
-for fn in ${prv[@]}; do
-    echo "Making function \""$fn"\" private..."
-    sls mkfunc-pvt --param="function=$fn"
-done
-echo "done"
+#echo "-------------------------------------------------------------------------"
+#echo "updating private functions"
+#echo "-------------------------------------------------------------------------"
+## Run the mkfunc-pvt command for each private function
+#for fn in ${prv[@]}; do
+#    echo "Making function \""$fn"\" private..."
+#    sls mkfunc-pvt --param="function=$fn"
+#done
+#echo "done"
