@@ -96,6 +96,15 @@ functions:
     environment:
       FUNCTION_TRIGGER_TYPE: CLOUD_PUBSUB_TRIGGER
 
+  fixThreadLabels:
+    handler: fixThreadLabels
+    events:
+      - event:
+          eventType: providers/cloud.pubsub/eventTypes/topic.publish
+          resource: ${self:custom.messageTopicResource}
+    environment:
+      FUNCTION_TRIGGER_TYPE: CLOUD_PUBSUB_TRIGGER
+
 # you can define resources, templates etc. the same way you would in a
 # Google Cloud deployment configuration
 #resources:
