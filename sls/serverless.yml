@@ -17,6 +17,7 @@ provider:
   environment:
     GCP_PROJECT: ${env:GCP_PROJECT}
     PUBSUB_TOPIC: ${self:custom.topicName}
+    PUBSUB_MESSAGE_TOPIC: ${self:custom.messageTopicName}
     GOOGLE_CLIENT_ID: ${env:GOOGLE_CLIENT_ID}
     GOOGLE_CLIENT_SECRET: ${env:GOOGLE_CLIENT_SECRET}
     GOOGLE_CALLBACK_URL: ${env:GOOGLE_CALLBACK_URL}
@@ -49,6 +50,8 @@ custom:
       mkfunc-pvt: gcloud functions remove-iam-policy-binding ${self:service}-${self:provider.stage}-${param:function, ""} --member="allUsers" --role="roles/cloudfunctions.invoker" --project=${self:provider.project} --region=${self:provider.region}
   topicName: ${self:service}-gmail-push
   topicResource: projects/${env:GCP_PROJECT}/topics/${self:custom.topicName}
+  messageTopicName: ${self:service}-gmail-message
+  messageTopicResource: projects/${env:GCP_PROJECT}/topics/${self:custom.messageTopicName}
 
 functions:
   auth_init:
@@ -113,3 +116,7 @@ resources:
             - role: roles/pubsub.publisher
               members:
                   - "serviceAccount:gmail-api-push@system.gserviceaccount.com"
+    - type: pubsub.v1.topic
+      name: ${self:custom.messageTopicName}
+      properties:
+        topic: ${self:custom.messageTopicName}

@@ -1,6 +1,9 @@
-const Auth = require('@google-cloud/express-oauth2-handlers');
-const {Datastore} = require('@google-cloud/datastore');
 const {google} = require('googleapis');
+const {PubSub} = require('@google-cloud/pubsub');
+const {Datastore} = require('@google-cloud/datastore');
+
+const Auth = require('@google-cloud/express-oauth2-handlers');
+
 const gmail = google.gmail('v1');
 
 const datastoreClient = new Datastore();
@@ -12,6 +15,8 @@ const requiredScopes = [
 ];
 
 const auth = Auth('datastore', requiredScopes, 'email', true);
+
+const PUBSUB_MESSAGE_TOPIC = process.env.PUBSUB_MESSAGE_TOPIC;
 
 // if historyId is bigger or not recorded
 //     store the historyId
@@ -76,6 +81,25 @@ const getMessagesChanged = async (email, historyId) => {
   }
 };
 
+// Creates a client; cache this for further use
+const pubSubClient = new PubSub();
+
+async function publishMessage(topicNameOrId, data) {
+  // Publishes the message as a string, e.g. "Hello, world!" or JSON.stringify(someObject)
+  const dataBuffer = Buffer.from(data);
+
+  try {
+    const messageId = await pubSubClient
+        .topic(topicNameOrId)
+        .publishMessage({data: dataBuffer});
+    console.log(`Message ${messageId} published.`);
+  } catch (error) {
+    console.error(`Received error while publishing: ${error.message}`);
+
+    process.exitCode = 1;
+  }
+}
+
 exports.watchGmailMessages = async (event) => {
   // Decode the incoming Gmail push notification.
   const data = Buffer.from(event.data, 'base64').toString();
@@ -95,5 +119,19 @@ exports.watchGmailMessages = async (event) => {
   google.options({auth: authClient});
 
   const messages = await getMessagesChanged(email, historyId);
+
   console.log(messages);
+
+  let publishing = [];
+
+  messages.forEach((message) => {
+    const data = JSON.stringify({
+      email: email,
+      message: message,
+    });
+
+    publishing += publishMessage(PUBSUB_MESSAGE_TOPIC, data);
+  });
+
+  Promise.all(publishing);
 };
