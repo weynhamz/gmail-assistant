@@ -16,6 +16,8 @@ const requiredScopes = [
 
 const auth = Auth('datastore', requiredScopes, 'email', true);
 
+const GCP_PROJECT = process.env.GCP_PROJECT;
+const PUBSUB_TOPIC = process.env.PUBSUB_TOPIC;
 const PUBSUB_MESSAGE_TOPIC = process.env.PUBSUB_MESSAGE_TOPIC;
 
 // if historyId is bigger or not recorded
@@ -117,6 +119,15 @@ exports.watchGmailMessages = async (event) => {
 
   const authClient = await auth.auth.authedUser.getClient();
   google.options({auth: authClient});
+
+  // TODO Record a timestamp, no need to watch everytime.
+  gmail.users.watch({
+    userId: email,
+    requestBody: {
+      labelIds: ['INBOX'],
+      topicName: `projects/${GCP_PROJECT}/topics/${PUBSUB_TOPIC}`,
+    },
+  });
 
   const messages = await getMessagesChanged(email, historyId);
 
