@@ -86,6 +86,25 @@ async function fixThreadLabels(threadId) {
   });
   removeLabelIds = ['IMPORTANT'];
 
+  //
+  // Archive message labeled with jira but irrelevant to me
+  //
+  let ON_ME=false;
+  let IS_IGNORE=false;
+  addLabelIds.forEach((labelId) => {
+    if (Labels[labelId].name == '0_ON_ME') {
+      console.info('ON_ME');
+      ON_ME=true;
+    }
+    if (Labels[labelId].name.match(/jira$/)) {
+      console.info('IS_JIRA');
+      IS_IGNORE=true;
+    }
+  });
+  if (!ON_ME && IS_IGNORE) {
+    removeLabelIds.push('INBOX');
+  }
+
   console.info('addLabelIds:' + addLabelIds);
   console.info('removeLabelIds:' + removeLabelIds);
 
