@@ -48,9 +48,9 @@ custom:
       mkfunc-pub: gcloud functions add-iam-policy-binding ${self:service}-${self:provider.stage}-${param:function, ""} --member="allUsers" --role="roles/cloudfunctions.invoker" --project=${self:provider.project} --region=${self:provider.region}
       # make the specified function private
       mkfunc-pvt: gcloud functions remove-iam-policy-binding ${self:service}-${self:provider.stage}-${param:function, ""} --member="allUsers" --role="roles/cloudfunctions.invoker" --project=${self:provider.project} --region=${self:provider.region}
-  topicName: ${self:service}-gmail-push
+  topicName: ${self:service}-${self:provider.stage}-gmail-push
   topicResource: projects/${env:GCP_PROJECT}/topics/${self:custom.topicName}
-  messageTopicName: ${self:service}-gmail-message
+  messageTopicName: ${self:service}-${self:provider.stage}-gmail-message
   messageTopicResource: projects/${env:GCP_PROJECT}/topics/${self:custom.messageTopicName}
 
 functions:
