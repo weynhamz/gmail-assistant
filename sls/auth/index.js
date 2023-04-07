@@ -23,9 +23,9 @@ const PUBSUB_TOPIC = process.env.PUBSUB_TOPIC;
 // Call the Gmail API (Users.watch) to set up Gmail push notifications.
 // Gmail will send a notification to the specified Cloud Pub/Sun topic
 // every time a new mail arrives in inbox.
-const setUpGmailPushNotifications = (email, pubsubTopic) => {
+const setUpGmailPushNotifications = (pubsubTopic) => {
   return gmail.users.watch({
-    userId: email,
+    userId: 'me',
     requestBody: {
       labelIds: ['INBOX'],
       topicName: `projects/${GCP_PROJECT}/topics/${pubsubTopic}`,
@@ -49,7 +49,7 @@ const onSuccess = async (req, res) => {
   }
 
   try {
-    await setUpGmailPushNotifications(email, PUBSUB_TOPIC);
+    await setUpGmailPushNotifications(PUBSUB_TOPIC);
   } catch (err) {
     console.log(err);
     if (!err.toString().includes('one user push notification client allowed per developer')) {

@@ -56,7 +56,7 @@ const getMessagesChanged = async (email, historyId) => {
     });
 
     const listChanges = await gmail.users.history.list({
-      userId: email,
+      userId: 'me',
       historyTypes: ['messageAdded'],
       startHistoryId: lastHistoryId.lastHistoryId,
     });
@@ -122,7 +122,7 @@ exports.watchGmailMessages = async (event) => {
 
   // TODO Record a timestamp, no need to watch everytime.
   gmail.users.watch({
-    userId: email,
+    userId: 'me',
     requestBody: {
       labelIds: ['INBOX'],
       topicName: `projects/${GCP_PROJECT}/topics/${PUBSUB_TOPIC}`,
