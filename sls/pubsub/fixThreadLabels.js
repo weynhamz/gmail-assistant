@@ -42,15 +42,15 @@ async function fixThreadLabels(threadId) {
   });
   const messages = messagesRes.data.messages;
 
-  // Skip if only 1 message in thread
-  if (messages.length <= 1) {
-     return;
-  }
-
   // Loop through messages in the thread
   // to caculate thread labels
   messages.forEach((message) => {
     const labelIds = message.labelIds.filter((labelId) => {
+      // Process 'IMPORTANT' messeges
+      if (labelId == 'IMPORTANT') {
+        return true;
+      }
+
       // Care only the user labels
       if (Labels[labelId].type == 'system') {
         return false;
@@ -74,7 +74,17 @@ async function fixThreadLabels(threadId) {
   let addLabelIds = [];
   let removeLabelIds = [];
 
-  addLabelIds = threadLabelIds;
+  //
+  // Remove 'IMPORTANT' label
+  //
+  // Gmail's 'IMPORTANT' marker is messed up
+  addLabelIds = threadLabelIds.filter((labelId) => {
+    if (labelId == 'IMPORTANT') {
+      return false;
+    }
+    return true;
+  });
+  removeLabelIds = ['IMPORTANT'];
 
   console.info('addLabelIds:' + addLabelIds);
   console.info('removeLabelIds:' + removeLabelIds);
