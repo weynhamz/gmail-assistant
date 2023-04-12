@@ -110,6 +110,8 @@ exports.watchGmailMessages = async (event) => {
   const email = newMessageNotification.emailAddress;
   const historyId = newMessageNotification.historyId;
 
+  console.debug(email);
+
   try {
     await auth.auth.requireAuth(null, null, email);
   } catch (err) {
@@ -120,6 +122,8 @@ exports.watchGmailMessages = async (event) => {
   const authClient = await auth.auth.authedUser.getClient();
   google.options({auth: authClient});
 
+  console.debug('auth done');
+
   // TODO Record a timestamp, no need to watch everytime.
   gmail.users.watch({
     userId: 'me',
@@ -128,6 +132,8 @@ exports.watchGmailMessages = async (event) => {
       topicName: `projects/${GCP_PROJECT}/topics/${PUBSUB_TOPIC}`,
     },
   });
+
+  console.debug('watch done');
 
   const messages = await getMessagesChanged(email, historyId);
 
