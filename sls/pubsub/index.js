@@ -48,12 +48,6 @@ const getMessagesChanged = async (email, historyId) => {
 
   if (lastHistoryId && historyId > lastHistoryId.lastHistoryId) {
     console.debug('lastHistoryId: ' + lastHistoryId.lastHistoryId);
-    await datastoreClient.save({
-      key: datastoreKey,
-      data: {
-        lastHistoryId: historyId,
-      },
-    });
 
     const listChanges = await gmail.users.history.list({
       userId: 'me',
@@ -65,7 +59,6 @@ const getMessagesChanged = async (email, historyId) => {
     console.debug(listChanges.data);
 
     const messagesAdded = {};
-
     if (listChanges.data.history) {
       listChanges.data.history.forEach((history) => {
         if (history.messages) {
@@ -78,6 +71,13 @@ const getMessagesChanged = async (email, historyId) => {
 
     console.debug('Changed Messages:');
     console.debug(messagesAdded);
+
+    await datastoreClient.save({
+      key: datastoreKey,
+      data: {
+        lastHistoryId: historyId,
+      },
+    });
 
     return Object.values(messagesAdded);
   }
