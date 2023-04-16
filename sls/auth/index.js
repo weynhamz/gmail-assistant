@@ -17,18 +17,18 @@ const requiredScopes = [
 
 const auth = Auth('datastore', requiredScopes, 'email', true);
 
-const GCP_PROJECT = process.env.GCP_PROJECT;
-const PUBSUB_TOPIC = process.env.PUBSUB_TOPIC;
-
 // Call the Gmail API (Users.watch) to set up Gmail push notifications.
 // Gmail will send a notification to the specified Cloud Pub/Sun topic
 // every time a new mail arrives in inbox.
-const setUpGmailPushNotifications = (pubsubTopic) => {
+const setUpGmailPushNotifications = () => {
+  const GCP_PROJECT = process.env.GCP_PROJECT;
+  const PUBSUB_TOPIC = process.env.PUBSUB_TOPIC;
+
   return gmail.users.watch({
     userId: 'me',
     requestBody: {
       labelIds: ['INBOX'],
-      topicName: `projects/${GCP_PROJECT}/topics/${pubsubTopic}`,
+      topicName: `projects/${GCP_PROJECT}/topics/${PUBSUB_TOPIC}`,
     },
   });
 };
@@ -49,7 +49,7 @@ const onSuccess = async (req, res) => {
   }
 
   try {
-    await setUpGmailPushNotifications(PUBSUB_TOPIC);
+    await setUpGmailPushNotifications();
   } catch (err) {
     console.log(err);
     if (!err.toString().includes('one user push notification client allowed per developer')) {
