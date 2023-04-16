@@ -1,12 +1,6 @@
 const {google} = require('googleapis');
-const Auth = require('@google-cloud/express-oauth2-handlers');
 
-const requiredScopes = [
-  'profile',
-  'email',
-  'https://www.googleapis.com/auth/gmail.modify',
-];
-const auth = Auth('datastore', requiredScopes, 'email', true);
+const {restoreAuthClient} = require('../auth/helpers');
 
 const gmail = google.gmail('v1');
 
@@ -128,14 +122,10 @@ exports.fixThreadLabels = async (event) => {
 
   console.debug(payload);
 
-  try {
-    await auth.auth.requireAuth(null, null, payload.email);
-    const authClient = await auth.auth.authedUser.getClient();
-    google.options({auth: authClient});
-  } catch (err) {
-    console.log('An error has occurred in the auth process.');
-    throw err;
-  }
+  const authClient = await restoreAuthClient(payload.email);
+
+  // Set up the googleapis library to use the returned tokens.
+  google.options({auth: authClient});
 
   await fixThreadLabels(payload.message.threadId);
 };

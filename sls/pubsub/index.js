@@ -2,19 +2,11 @@ const {google} = require('googleapis');
 const {PubSub} = require('@google-cloud/pubsub');
 const {Datastore} = require('@google-cloud/datastore');
 
-const Auth = require('@google-cloud/express-oauth2-handlers');
+const {restoreAuthClient} = require('../auth/helpers');
 
 const gmail = google.gmail('v1');
 
 const datastoreClient = new Datastore();
-
-const requiredScopes = [
-  'profile',
-  'email',
-  'https://www.googleapis.com/auth/gmail.modify',
-];
-
-const auth = Auth('datastore', requiredScopes, 'email', true);
 
 const GCP_PROJECT = process.env.GCP_PROJECT;
 const PUBSUB_TOPIC = process.env.PUBSUB_TOPIC;
@@ -112,17 +104,10 @@ exports.watchGmailMessages = async (event) => {
 
   console.debug(email);
 
-  try {
-    await auth.auth.requireAuth(null, null, email);
-  } catch (err) {
-    console.log('An error has occurred in the auth process.');
-    throw err;
-  }
+  const authClient = await restoreAuthClient(email);
 
-  const authClient = await auth.auth.authedUser.getClient();
+  // Set up the googleapis library to use the returned tokens.
   google.options({auth: authClient});
-
-  console.debug('auth done');
 
   // TODO Record a timestamp, no need to watch everytime.
   gmail.users.watch({
