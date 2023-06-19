@@ -90,10 +90,6 @@ async function fixThreadLabels(threadId) {
       console.info('ON_ME');
       ON_ME=true;
     }
-    if (Labels[labelId].name.match(/jira$/)) {
-      console.info('IS_JIRA');
-      IS_IGNORE=true;
-    }
   });
   if (!ON_ME && IS_IGNORE) {
     removeLabelIds.push('INBOX');
